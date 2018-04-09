@@ -28,11 +28,6 @@ __version__ = "1.0.1"
 __maintainer__ = "MII#0255"
 
 
-HOME_PATH = os.path.split(os.path.realpath(__file__))[0]
-PAK_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Content/Paks/")
-INI_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Saved/Config/LinuxServer/Game.ini")
-RULESET_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Saved/Config/Rulesets/rulesets.json")
-
 #TODO THESE MUST BE CHANGED TO THE SUITABLE VALUES
 PRIVCODE = "abcdefg0123456789"
 SERVER_TOKEN = "abcdefg0123456789"
@@ -42,6 +37,11 @@ REFERENCE_FILENAME = 'references.txt'
 PORT = 7777
 
 PURGE_OLD = True # WARNING: set to false if you do not want unlisted paks deleted
+
+HOME_PATH = os.path.split(os.path.realpath(__file__))[0]
+PAK_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Content/Paks/")
+INI_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Saved/Config/LinuxServer/Game.ini")
+RULESET_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Saved/Config/Rulesets/rulesets.json")
 
 
 def main(args):
