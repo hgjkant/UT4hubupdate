@@ -1,3 +1,15 @@
+#!/usr/bin/env python3
+
+"""A simple script to update UT4 hubs
+Options:
+(no options) : if PORT is not taken (hub isn't running) do all updates
+-f           : run all updates, even if the hub is up
+-r           : only update rulesets
+-i           : only update ini's
+-p           : only update paks
+
+you may use any of these in combination with each other to produce the desired result"""
+
 import os
 import sys
 import time 
@@ -6,6 +18,14 @@ import re                       # parse references
 import urllib.request           # download
 import tempfile                 # ini rewriting
 import shutil
+import socket                   # check if server is running
+
+
+__author__ = "MII#0255"
+__credits__ = ["MII#0255", "skandalouz#1109", "Scoob#7073"]
+__license__ = "MIT"
+__version__ = "1.0.1"
+__maintainer__ = "MII#0255"
 
 
 HOME_PATH = os.path.split(os.path.realpath(__file__))[0]
@@ -13,24 +33,33 @@ PAK_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Content/Paks/")
 INI_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Saved/Config/LinuxServer/Game.ini")
 RULESET_PATH = os.path.join(HOME_PATH, "LinuxServer/UnrealTournament/Saved/Config/Rulesets/rulesets.json")
 
-PRIVCODE = "28pT34hJdIppodtKd97K9MwNqn0AjBdt"
-SERVER_TOKEN = "QIKzedUbeVquGjofcyjQ7VQiO7sB2TDZ"
-ALLOWED_RULES = "4,5,6,7,8,9,10,11,12,13,16,17,18,20,21,52,43,22,23,24,26,27,28,61,41,32,31,29,47"
+#TODO THESE MUST BE CHANGED TO THE SUITABLE VALUES
+PRIVCODE = "abcdefg0123456789"
+SERVER_TOKEN = "abcdefg0123456789"
+ALLOWED_RULES = "1,2,3,4,5"
 HIDE_DEFAULTS = True
 REFERENCE_FILENAME = 'references.txt'
+PORT = 7777
 
 PURGE_OLD = True # WARNING: set to false if you do not want unlisted paks deleted
 
 
 def main(args):
-    '''runs the update, based on validation and user input'''
+    """runs the update, based on validation and user input"""
 
     output = validate()
-    references = download_references() # always get latest references
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex(('127.0.0.1',PORT))
 
-    if not args: # update everything if theres no arguments
+    if result != 0 and '-f' not in args:
+        print('server appears to be running, use the argument -f if you would like to ignore this')
+        return
+
+    if not args or args == ['-f']: # update everything if theres no arguments or only -f
         print('No arguments specified, running full update')
         args = args + ['-r', '-i', '-p']
+
+    references = download_references() # always get latest references
 
     if '-p' in args:
         if output[0]:
@@ -60,7 +89,7 @@ def main(args):
 
 
 def validate():
-    '''checks file paths and makes sure the program is able to run'''
+    """checks file paths and makes sure the program is able to run"""
     pak_check = os.path.exists(PAK_PATH)
     ini_check = os.path.isfile(INI_PATH)
     rules_check = os.path.isfile(RULESET_PATH)
@@ -71,7 +100,7 @@ def validate():
 
 
 def update_rulesets():
-    ''' a new ruleset file based on the info given above'''
+    """ a new ruleset file based on the info given above"""
     print('=============')
     print('Downloading ruleset')
     if HIDE_DEFAULTS:
@@ -84,8 +113,8 @@ def update_rulesets():
 
 
 def download_references():
-    '''downloads the latest ini configuration to "list.txt" and extracts its contents
-        NOTE: this will download to cwd'''
+    """downloads the latest ini configuration to "list.txt" and extracts its contents
+        NOTE: this will download to cwd"""
     print('=============')
     print('Downloading references')
     path = os.path.join(HOME_PATH, REFERENCE_FILENAME)
@@ -98,7 +127,7 @@ def download_references():
     
 
 def find_paks():
-    '''returns a dictionary of name:(path, checksum) reading the current pak files'''
+    """returns a dictionary of name:(path, checksum) reading the current pak files"""
     print('=============')
     print('Checking paks')
     file_list = [x for x in os.listdir(os.path.join(HOME_PATH, PAK_PATH)) if x.endswith('.pak')]
@@ -118,11 +147,11 @@ def find_paks():
 
     
 def download_new_paks(references):
-    '''given a list of references, cross-references with paks for matches 
+    """given a list of references, cross-references with paks for matches 
         and then does the following things:
         ignore any matches
         if an item does not exist in the first list, but does in the second: download it
-        for the reverse: if PURGE_OLD is set to true, delete the pak'''
+        for the reverse: if PURGE_OLD is set to true, delete the pak"""
     print('=============')
     new_paks = extract_info(references)
     current_paks = find_paks()
@@ -165,7 +194,7 @@ def download_new_paks(references):
 
 
 def extract_info(reference_list):
-    '''given a list of references, extract all the information given into a more digestable form'''
+    """given a list of references, extract all the information given into a more digestable form"""
     print('=============')
     print('Extracting reference information')
     return_list = []
@@ -182,7 +211,7 @@ def extract_info(reference_list):
 
 
 def overwrite_game_ini(references):
-    '''given a list of references, overwrites the current references in game.ini'''
+    """given a list of references, overwrites the current references in game.ini"""
     print('=============')
     print('Rewriting game ini references')
 
