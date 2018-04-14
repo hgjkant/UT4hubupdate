@@ -24,7 +24,7 @@ import socket                   # check if server is running
 __author__ = "MII#0255"
 __credits__ = ["MII#0255", "skandalouz#1109", "Scoob#7073"]
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __maintainer__ = "MII#0255"
 
 
@@ -78,12 +78,10 @@ def main(args):
             print('please make sure that INI_PATH points to your game ini')
 
     if '-r' in args: # update rulesets
-        if output[2]:
-            update_rulesets()
+        if not output[2]:
+            print('Saving ruleset under new file:', RULESET_PATH)
 
-        else:
-            # invalid ruleset path error message
-            print('please make sure that RULESET_PATH points to a valid ruleset json')
+        update_rulesets()
 
 
 
